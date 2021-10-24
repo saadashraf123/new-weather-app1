@@ -1,0 +1,181 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import Input from "./components/Input";
+import Weather from "./components/Weather";
+import PostWeather from "./components/PostWeather";
+import Mode from "./components/Mode";
+
+const APIkey = "f28836b7dcdf328bc7bd5047a2a7e35a";
+
+function App(e) {
+  const [city, setCity] = useState("");
+  const [temp, setTemp] = useState(null);
+  const [minTemp, setMinTemp] = useState(null);
+  const [maxTemp, setMaxTemp] = useState(null);
+  const [icon, setIcon] = useState("");
+  const [desc, setDesc] = useState("");
+  const [feels, setFeels] = useState(null);
+  const [humidity, setHumidity] = useState(null);
+  const [sunrise, setSunrise] = useState(null);
+  const [sunset, setSunset] = useState(null);
+
+  const [date, setDate] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [arr, setArray] = useState([]);
+  const [inputs, setInputs] = useState("");
+  const [mode, setMode] = useState(false);
+  const [vars, setVars] = useState(false);
+
+  useEffect(() => {
+    defaultWeather();
+  }, [!inputs]);
+
+  // useEffect(() => {
+  //   if (arr != "") {
+  //     getWeather(e);
+  //   }
+  // }, [arr]);
+
+  const defaultWeather = () => {
+    if (!inputs) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        axios
+          .get(
+            `https://api.openweathermap.org/data/2.5/onecall?lat=${position.coords.latitude}&lon=${position.coords.longitude}&exclude=minutely,hourly&appid=${APIkey}`
+          )
+          .then((response1) => {
+            setLoading(false);
+            setDate(response1.data.current.dt);
+            setCity(response1.data.timezone);
+            setTemp(conToCelcius(response1.data.current.temp));
+            setFeels(conToCelcius(response1.data.current.feels_like));
+            setDesc(response1.data.current.weather[0].description);
+            getIcon(response1.data.current.weather[0].id);
+            setVars(true);
+          });
+      });
+      setInputs("hello");
+    }
+  };
+
+  const getWeather = async (e) => {
+    e.preventDefault();
+    const input = e.currentTarget.elements.city.value;
+    if (input) {
+      setVars(false);
+      axios
+        .get(
+          `http://api.openweathermap.org/data/2.5/weather?q=${input}&appid=${APIkey}`
+        )
+        .then((response) => {
+          setDate(response.data.dt);
+          setCity(`${response.data.name}, ${response.data.sys.country}`);
+          setTemp(conToCelcius(response.data.main.temp));
+          setMinTemp(conToCelcius(response.data.main.temp_min));
+          setMaxTemp(conToCelcius(response.data.main.temp_max));
+          setFeels(conToCelcius(response.data.main.feels_like));
+          setDesc(response.data.weather[0].description);
+          getIcon(response.data.weather[0].id);
+
+          axios
+            .get(
+              `https://api.openweathermap.org/data/2.5/onecall?lat=${response.data.coord.lat}&lon=${response.data.coord.lon}&exclude=minutely,hourly&appid=${APIkey}`
+            )
+            .then((responses) => {
+              setArray(responses.data.daily);
+              setDate(responses.data.current.dt);
+              setHumidity(responses.data.current.humidity);
+              setSunrise(responses.data.current.sunset);
+              setSunset(responses.data.current.sunrise);
+            });
+        });
+    } else {
+      alert("Please Enter The City To Check The Weather");
+    }
+  };
+
+  const weatherIcon = {
+    Thunderstorm: "fas fa-bolt",
+    Drizzle: "fas fa-cloud-drizzle",
+    Rain: "fas fa-cloud-showers-heavy",
+    Snow: "fas fa-snowflake",
+    Atmosphere: "fas fa-cloud",
+    Clear: "fas fa-cloud-sun",
+    Clouds: "fas fa-cloud",
+  };
+
+  const getIcon = (range) => {
+    switch (true) {
+      case range >= 200 && range <= 232:
+        setIcon(weatherIcon.Thunderstorm);
+        break;
+
+      case range >= 300 && range <= 321:
+        setIcon(weatherIcon.Drizzle);
+        break;
+
+      case range >= 500 && range <= 531:
+        setIcon(weatherIcon.Rain);
+        break;
+
+      case range >= 600 && range <= 622:
+        setIcon(weatherIcon.Snow);
+        break;
+
+      case range >= 701 && range <= 781:
+        setIcon(weatherIcon.Atmosphere);
+        break;
+
+      case range === 800:
+        setIcon(weatherIcon.Clear);
+        break;
+
+      case range >= 800 && range <= 804:
+        setIcon(weatherIcon.Clouds);
+        break;
+    }
+  };
+
+  const conToCelcius = (temp) => {
+    const celcius = Math.floor(temp - 273);
+    return celcius;
+  };
+
+  const changeMode = () => {
+    setMode(!mode);
+  };
+
+  return (
+    <div className={`container ${mode ? "mode" : ""}`}>
+      <Mode changeMode={changeMode} mode={mode} />
+      <Input getWeather={getWeather} city={city} />
+      {loading ? (
+        "Loading...  Please Wait.."
+      ) : (
+        <Weather
+          city={city}
+          temp={temp}
+          feels={feels}
+          minTemp={minTemp}
+          maxTemp={maxTemp}
+          icon={icon}
+          desc={desc}
+          date={date}
+          humidity={humidity}
+          sunrise={sunrise}
+          sunset={sunset}
+          vars={vars}
+        />
+      )}
+
+      <PostWeather
+        icon={icon}
+        temp={temp}
+        arr={arr}
+        conversion={conToCelcius}
+      />
+    </div>
+  );
+}
+
+export default App;
