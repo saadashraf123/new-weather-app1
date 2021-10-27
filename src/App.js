@@ -5,7 +5,6 @@ import Weather from "./components/Weather";
 import PostWeather from "./components/PostWeather";
 import Details from "./components/Details";
 import Mode from "./components/Mode";
-import Error from "./components/Error";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 const APIkey = "f28836b7dcdf328bc7bd5047a2a7e35a";
@@ -210,7 +209,6 @@ function App(e) {
               />
             )}
           />
-          <Route path="*" component={Error} />
         </Switch>
       </div>
     </Router>
