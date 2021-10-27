@@ -11,7 +11,7 @@ const Weather = (props) => {
       </h5>
       {props.temp ? <h1>{props.temp}&deg;C</h1> : ""}
       {props.feels ? <h3>Feels Like: {props.feels}&deg;C</h3> : ""}
-      {minmaxTemp(props.minTemp, props.maxTemp)}
+      {props.minmaxTemp(props.minTemp, props.maxTemp)}
       <h1>{props.desc}</h1>
       {!props.vars ? (
         <div>
@@ -26,13 +26,6 @@ const Weather = (props) => {
   );
 };
 
-const minmaxTemp = (min, max) => {
-  return (
-    <h3>
-      {min ? <span>Min: {min}&deg;C</span> : ""}
-      {max ? <span>Max: {max}&deg;C</span> : ""}
-    </h3>
-  );
-};
+
 
 export default Weather;

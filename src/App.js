@@ -3,7 +3,10 @@ import { useEffect, useState } from "react";
 import Input from "./components/Input";
 import Weather from "./components/Weather";
 import PostWeather from "./components/PostWeather";
+import Details from "./components/Details";
 import Mode from "./components/Mode";
+import Error from "./components/Error";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 const APIkey = "f28836b7dcdf328bc7bd5047a2a7e35a";
 
@@ -26,15 +29,17 @@ function App(e) {
   const [mode, setMode] = useState(false);
   const [vars, setVars] = useState(false);
 
+  const [taskDetails, setTaskDetails] = useState("");
+  const [newIcon, setNewIcon] = useState("");
+
   useEffect(() => {
     defaultWeather();
   }, [!inputs]);
 
-  // useEffect(() => {
-  //   if (arr != "") {
-  //     getWeather(e);
-  //   }
-  // }, [arr]);
+  const getDayDetails = (id) => {
+    const detailed = arr[id + 1];
+    setTaskDetails(detailed);
+  };
 
   const defaultWeather = () => {
     if (!inputs) {
@@ -65,7 +70,7 @@ function App(e) {
       setVars(false);
       axios
         .get(
-          `http://api.openweathermap.org/data/2.5/weather?q=${input}&appid=${APIkey}`
+          `https://api.openweathermap.org/data/2.5/weather?q=${input}&appid=${APIkey}`
         )
         .then((response) => {
           setDate(response.data.dt);
@@ -94,44 +99,39 @@ function App(e) {
     }
   };
 
-  const weatherIcon = {
-    Thunderstorm: "fas fa-bolt",
-    Drizzle: "fas fa-cloud-drizzle",
-    Rain: "fas fa-cloud-showers-heavy",
-    Snow: "fas fa-snowflake",
-    Atmosphere: "fas fa-cloud",
-    Clear: "fas fa-cloud-sun",
-    Clouds: "fas fa-cloud",
-  };
-
   const getIcon = (range) => {
     switch (true) {
       case range >= 200 && range <= 232:
-        setIcon(weatherIcon.Thunderstorm);
+        setIcon("fas fa-bolt");
         break;
 
       case range >= 300 && range <= 321:
-        setIcon(weatherIcon.Drizzle);
+        setIcon("fas fa-cloud-drizzle");
+
         break;
 
       case range >= 500 && range <= 531:
-        setIcon(weatherIcon.Rain);
+        setIcon("fas fa-cloud-showers-heavy");
         break;
 
       case range >= 600 && range <= 622:
-        setIcon(weatherIcon.Snow);
+        setIcon("fas fa-snowflake");
+
         break;
 
       case range >= 701 && range <= 781:
-        setIcon(weatherIcon.Atmosphere);
+        setIcon("fas fa-cloud");
+
         break;
 
       case range === 800:
-        setIcon(weatherIcon.Clear);
+        setIcon("fas fa-cloud-sun");
+
         break;
 
       case range >= 800 && range <= 804:
-        setIcon(weatherIcon.Clouds);
+        setIcon("fas fa-cloud");
+
         break;
     }
   };
@@ -141,40 +141,79 @@ function App(e) {
     return celcius;
   };
 
+  const minmaxTemp = (min, max) => {
+    return (
+      <h3>
+        <span>Min: {min}&deg;C</span>
+        <span>Max: {max}&deg;C</span>
+      </h3>
+    );
+  };
+
   const changeMode = () => {
     setMode(!mode);
   };
 
   return (
-    <div className={`container ${mode ? "mode" : ""}`}>
-      <Mode changeMode={changeMode} mode={mode} />
-      <Input getWeather={getWeather} city={city} />
-      {loading ? (
-        "Loading...  Please Wait.."
-      ) : (
-        <Weather
-          city={city}
-          temp={temp}
-          feels={feels}
-          minTemp={minTemp}
-          maxTemp={maxTemp}
-          icon={icon}
-          desc={desc}
-          date={date}
-          humidity={humidity}
-          sunrise={sunrise}
-          sunset={sunset}
-          vars={vars}
-        />
-      )}
+    <Router>
+      <div className={`container ${mode ? "mode" : ""}`}>
+        <Mode changeMode={changeMode} mode={mode} />
+        <Switch>
+          <Route
+            path="/"
+            exact
+            render={(props) => (
+              <>
+                <Input getWeather={getWeather} city={city} />
+                {loading ? (
+                  "Loading...  Please Wait.."
+                ) : (
+                  <Weather
+                    city={city}
+                    temp={temp}
+                    feels={feels}
+                    minTemp={minTemp}
+                    maxTemp={maxTemp}
+                    icon={icon}
+                    desc={desc}
+                    date={date}
+                    humidity={humidity}
+                    sunrise={sunrise}
+                    sunset={sunset}
+                    vars={vars}
+                    minmaxTemp={minmaxTemp}
+                  />
+                )}
 
-      <PostWeather
-        icon={icon}
-        temp={temp}
-        arr={arr}
-        conversion={conToCelcius}
-      />
-    </div>
+                <PostWeather
+                  icon={icon}
+                  temp={temp}
+                  arr={arr}
+                  conversion={conToCelcius}
+                  getDayDetails={getDayDetails}
+                />
+              </>
+            )}
+          />
+          <Route
+            path="/Details"
+            exact
+            render={(props) => (
+              <Details
+                city={city}
+                getDayDetails={getDayDetails}
+                arr={arr}
+                conversion={conToCelcius}
+                taskDetails={taskDetails}
+                icon={newIcon}
+                minmaxTemp={minmaxTemp}
+              />
+            )}
+          />
+          <Route path="/error" component={Error} />
+        </Switch>
+      </div>
+    </Router>
   );
 }
 
