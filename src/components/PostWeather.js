@@ -23,7 +23,7 @@ const PostWeather = ({ arr, conversion, getDayDetails }) => {
                     </h2>
                     <h4>Sunrise: {moment.unix(data.sunrise).format("LT")}</h4>
                     <h4>Sunset: {moment.unix(data.sunset).format("LT")}</h4>
-                    <Link className="btn" to="/Details">
+                    <Link className="btn" to="/new-weather-app/Details">
                       View full page Details
                     </Link>
                   </div>
