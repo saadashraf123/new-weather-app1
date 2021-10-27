@@ -160,7 +160,7 @@ function App(e) {
         <Mode changeMode={changeMode} mode={mode} />
         <Switch>
           <Route
-            path="/"
+            path="/new-weather-app"
             exact
             render={(props) => (
               <>
@@ -210,7 +210,7 @@ function App(e) {
               />
             )}
           />
-          <Route path="/error" component={Error} />
+          <Route path="*" component={Error} />
         </Switch>
       </div>
     </Router>

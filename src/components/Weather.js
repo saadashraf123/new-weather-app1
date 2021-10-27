@@ -11,7 +11,7 @@ const Weather = (props) => {
       </h5>
       {props.temp ? <h1>{props.temp}&deg;C</h1> : ""}
       {props.feels ? <h3>Feels Like: {props.feels}&deg;C</h3> : ""}
-      {props.minmaxTemp(props.minTemp, props.maxTemp)}
+      {!props.vars ? props.minmaxTemp(props.minTemp, props.maxTemp) : ""}
       <h1>{props.desc}</h1>
       {!props.vars ? (
         <div>
@@ -25,7 +25,5 @@ const Weather = (props) => {
     </div>
   );
 };
-
-
 
 export default Weather;

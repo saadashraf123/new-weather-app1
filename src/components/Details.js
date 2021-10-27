@@ -68,7 +68,7 @@ const Details = (props) => {
         "Something Went Wrong....."
       )}
       <br />
-      <Link className="btn" to="/">
+      <Link className="btn" to="/new-weather-app">
         go Back to Previous Page
       </Link>
     </div>
