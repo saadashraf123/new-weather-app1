@@ -195,7 +195,7 @@ function App(e) {
             )}
           />
           <Route
-            path="/Details"
+            path="/new-weather-app/Details"
             exact
             render={(props) => (
               <Details
