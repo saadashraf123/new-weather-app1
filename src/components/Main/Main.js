@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import Input from "./Input";
-import Weather from "./Weather";
-import PostWeather from "./PostWeather";
-import Details from "./Details";
-import Mode from "./Mode";
+import Input from "../Input/Input";
+import Weather from "../Weather";
+import PostWeather from "../PostWeather";
+import Details from "../Details/Details";
+import Mode from "../Mode";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 const APIkey = "f28836b7dcdf328bc7bd5047a2a7e35a";
